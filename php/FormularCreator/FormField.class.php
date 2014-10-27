@@ -104,7 +104,7 @@
 		$Ending = "";
 		
 		$tempFieldName = str_replace(" ", "", $this->FormFieldName);
-		
+
 		switch($this->FormFieldType) // überprüft, welchen Typ das Formularfeld hat
 		{
 			// Innerhalb jedes Falls wird ein HTML-Tag zusammengestellt, der schlussendlich ausgegeben wird, wodurch schliesslich das Formular aufgebaut wird
@@ -116,7 +116,7 @@
 			
 			case FieldTypes::Email:
 			{
-				$Beginning = "<input type='email'  value=" . $this->FieldValue ." pattern='' title='Bitte gültiges Emailformat: max.muster@email.ch' class='form-control' name='tb" . $tempFieldName . "'";
+				$Beginning = "<input type='email'  value='" . $this->FieldValue ."' pattern='/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/' title='Bitte gültiges Emailformat: max.muster@email.ch' class='form-control' name='tb" . $tempFieldName . "'";
 				break;
 			}
 			
@@ -198,7 +198,13 @@
 						return errorCodes::ERR_FORMAT;
 					}
 					break;
-				// evtl. Passwortformat vorgeben !
+				case FieldTypes::Password:
+					if(!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,20}$/', $this->FieldValue)){
+						return errorCodes::ERR_PASSWORD;
+					}
+					break;
+				
+				// DatumsFormat vorgeben und spezifische Fehlercodes dazunehmen
 			}
 			
 			if($this->isRequired && $this->FieldValue == "")

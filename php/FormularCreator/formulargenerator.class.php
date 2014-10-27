@@ -17,6 +17,7 @@
 		public $placeholderValues;
 		public $DB;
 		public $showCaptcha;
+		public $ImageUpload;
 		
 		public $Validator;
 		

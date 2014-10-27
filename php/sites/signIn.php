@@ -3,7 +3,7 @@
 	require_once("php/BusinessObjects/Entry.php");
 	require_once("php/gb.class.php");
 
-	$User = \Guestbook\UserAuthenticator::getLoggedInUser();
+	require_once("php/inc/loginChecker.php");
 	
 	// kreieren des Formulars zur Bearbeitung eines Eintrags
 	$EntryForm = Guestbook\gb::getEntryForm("Gästebucheintrag schreiben", "gbentries", array("id", "id_user", "CreationDate", "ModificationDate"), array(), array());

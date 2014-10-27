@@ -25,7 +25,7 @@
  <div class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="index.php" class="navbar-brand">Guestbook</a>
+          <a href="index.php?site=start" class="navbar-brand">Guestbook</a>
           <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -48,25 +48,10 @@
     </div>
   
 		<div class="container">
-			<div class="col-sm-3 col-md-2 sidebar">
-				<img class="img-thumbnail" src="Resources/UserImages/myhorse.jpg">
-				<ul class='userinformations'>
-					<li><?php //echo $User->Nickname; ?></li>
-					<li><?php //echo $User->getFormattedBirthDate(); ?></li>
-					<li><?php //echo $User->getAllEntries() . " Entry/-ies"; ?></li>
-				</ul>
-				<ul class="nav nav-sidebar">
-					<li class="active"><a href="index.php?site=profile">Profil</a></li>
-					<li><a href="index.php?site=show"><span class='badge pull-right'><?php echo \Guestbook\gb::countAllEntries(); ?></span>Entries</a></li>
-					<li><a href="http://google.ch">Use Google</a></li>
-				</ul>
-			</div>
-		<div id="row">
-			<div class="col-sm-8">
 			
 			<?php
 			
-			echo "<div class='modal fade' id='confirm-delete' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>" . PHP_EOL .
+						echo "<div class='modal fade' id='confirm-delete' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>" . PHP_EOL .
 						"<div class='modal-dialog'>" . PHP_EOL . 
 							"<div class='modal-content'>" . PHP_EOL .
 								"<div class='modal-header'>" . PHP_EOL .
@@ -82,11 +67,23 @@
 							"</div>" . PHP_EOL .
 						"</div>" . PHP_EOL .
 					   "</div>";
+			
+			if(Guestbook\UserAuthenticator::isUserAlreadyLoggedIn())
+			{
+				include_once("php/inc/sidebar.logout.inc.php");
+			}
+			else
+			{
+				include_once("php/inc/sidebar.login.inc.php");
+			}
 					   
 			if(array_key_exists("site", $_REQUEST))
 			{
-				switch($_REQUEST["site"])
+				switch(strtolower($_REQUEST["site"]))
 				{
+					case "start":
+						include_once("php/sites/Start.php");
+						break;
 					case "sign":
 						include_once("php/sites/signIn.php");
 						break;
@@ -102,6 +99,12 @@
 					case "profile":
 						include_once("php/sites/EditProfile.php");
 						break;
+					case "register":
+						include_once("php/sites/Register.php");
+						break;
+					case "show":
+						include_once("php/sites/showEntries.php");
+						break;
 				}
 				
 					if($_REQUEST["site"] == "logout")
@@ -110,18 +113,9 @@
 						GuestBook\UserAuthenticator::logOut();
 						echo "Du wurdest erfolgreich ausgeloggt";
 					}
-				
-					if($_REQUEST["site"] == "register")
-					{
-						Guestbook\UserAuthenticator::buildRegistryForm(array("id", "id_group", "ModificationDate", "CreationDate"), array("Passwort_p"));
-					}
-					
-					if($_REQUEST["site"] == "show")
-					{
-						Guestbook\gb::showEntries($User);
-					}
 				}
 			?>
+				</div>
 			</div>
 		</div>
 

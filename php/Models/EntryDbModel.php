@@ -37,7 +37,7 @@
 		{
 			self::$DB = \Guestbook\Data\DB::getConnection("read", "Resources/Configuration/config.ini");
 			
-			$stmt = self::$DB->prepare("SELECT id, Title, Comment, ModificationDate, CreationDate, id_user FROM gbentries");
+			$stmt = self::$DB->prepare("SELECT id, Title, Comment, ModificationDate, CreationDate, id_user FROM gbentries order by CreationDate desc");
 			
 			$entries = array();
 			

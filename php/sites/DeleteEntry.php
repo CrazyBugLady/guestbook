@@ -3,7 +3,7 @@
 	require_once("php/Models/EntryDbModel.php");
 	require_once("php/gb.class.php");
 
-	$User = \Guestbook\UserAuthenticator::getLoggedInUser();
+	require_once("php/inc/loginChecker.php");
 ?>
 	<h2>Eintrag löschen</h2>
 <?php

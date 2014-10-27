@@ -4,7 +4,7 @@
 	require_once("php/Models/EntryDbModel.php");
 	require_once("php/gb.class.php");
 
-	$User = \Guestbook\UserAuthenticator::getLoggedInUser();
+	require_once("php/inc/loginChecker.php");
 	
 	// Eintrag erfragen
 	$Entry = \Guestbook\Models\EntryDbModel::read($_REQUEST["entry"]);

@@ -30,6 +30,9 @@
 				case errorCodes::ERR_FORMAT:
 					$this->errorValidation .= "Format von " . $Field->FormFieldName . " falsch! <br>";
 					break;
+				case errorCodes::ERR_PASSWORD:
+					$this->errorValidation .= "Passwortformat: mindestens 1 Buchstabe, 1 Zahl & 1 Sonderzeichen ( 8 - 20 Zeichen )";
+					break;
 			}
 		}
 

@@ -4,8 +4,8 @@
 	require_once("php/Models/EntryDbModel.php");
 	require_once("php/gb.class.php");
 
-	$User = \Guestbook\UserAuthenticator::getLoggedInUser();
-
+	require_once("php/inc/loginChecker.php");
+	
 	$Active = (array_key_exists("active", $_REQUEST)) ? $_REQUEST["active"] : "profile";
 	
 ?>
@@ -16,7 +16,6 @@
         <li <?php if($Active == "profile"){ echo "class='active'"; } ?>><a href="#profile" data-toggle="tab"><span class='glyphicon glyphicon-user'> Übersicht</span></a></li>
         <li <?php if($Active == "passwort") { echo "class='active'"; } ?>><a href="#passwort" data-toggle="tab"><span class='glyphicon glyphicon-pencil'> Passwort</span></a></li>
         <li <?php if($Active == "contactdata") { echo "class='active'"; } ?>><a href="#contactdata" data-toggle="tab"><span class='gylphicon glyphicon-envelope'> Kontaktdaten</span></a></li>
-        <li <?php if($Active == "image") { echo "class='active'"; } ?>><a href="#image" data-toggle="tab"><span class='glyphicon glyphicon-picture'> Anzeigebild</span></a></li>
         <li <?php if($Active == "deleteProfile") { echo "class='active'"; } ?>><a href="#deleteProfile" data-toggle="tab"><span class='glyphicon glyphicon-trash'> Profil löschen</span></a></li>
     </ul>
     <div id="my-tab-content" class="tab-content">
@@ -28,7 +27,7 @@
         </div>
         <div class="tab-pane <?php if($Active == "passwort") { echo "active"; } ?>" id="passwort">
             <?php
-				$PasswordForm = new \FormularGenerator\formulargenerator("Passwort ändern", "users", array('Nickname', 'BirthDate', 'CreationDate', 'ModificationDate', 'id', 'id_group', 'UserImage_img', 'Email_e', "Website", 'Place'), array("Passwort_p", "Passwort_p"), array(), false);
+				$PasswordForm = new \FormularGenerator\formulargenerator("Passwort ändern", "users", array('Nickname', 'Lastname', 'Firstname', 'BirthDate', 'CreationDate', 'ModificationDate', 'id', 'id_group', 'UserImage_i', 'Email_e', "Website", 'Place'), array("Passwort_p", "Passwort_p"), array(), false);
 				$PasswordForm->createForm("index.php?site=profile&active=passwort");
 				
 				if(array_key_exists("pwPasswort", $_REQUEST))
@@ -52,7 +51,7 @@
 						?>
 							<div class="panel panel-danger">
 								<div class="panel-heading">
-									Ändern des Passworts nicht gelungen
+									Ändern des Passworts nicht erfolgreich
 								</div>
 					
 								<div class="panel-body">
@@ -71,13 +70,27 @@
         </div>
         <div class="tab-pane <?php if($Active == "contactdata") { echo "active"; } ?>" id="contactdata">
             <?php
-				$ContactDataForm = new \FormularGenerator\formulargenerator("Kontaktdaten ändern", "users", array('id_group', 'id', 'Nickname', 'BirthDate', 'CreationDate', 'ModificationDate', 'Passwort_p', 'UserImage_img'), array(), array($User->Website, $User->Email, $User->Place), false);
+				$Lastname = $User->Lastname;
+				$Website = $User->Website;
+				$Email = $User->Email;
+				$Place = $User->Place;
+			
+				if($Active == 'contactdata' && array_key_exists("submit", $_REQUEST))
+				{
+					$Lastname = $_REQUEST["tbLastname"];
+					$Website = $_REQUEST["tbWebsite"];
+					$Email = $_REQUEST["tbEmail"];
+					$Place = $_REQUEST["tbPlace"];
+				}
+			
+				$ContactDataForm = new \FormularGenerator\formulargenerator("Kontaktdaten ändern", "users", array('id_group', 'id', 'Nickname', 'Firstname', 'BirthDate', 'CreationDate', 'ModificationDate', 'Passwort_p', 'UserImage_i'), array(), array($Lastname, $Website, $Email, $Place), false);
 				$ContactDataForm->createForm("index.php?site=profile&active=contactdata");
 				
 				if($Active == 'contactdata' && array_key_exists("submit", $_REQUEST))
 				{
-					if($ContactDataForm->validate(array($_REQUEST["tbWebsite"], $_REQUEST["tbEmail"], $_REQUEST["tbPlace"])))
+					if($ContactDataForm->validationSuccessful(array($_REQUEST["tbLastname"], $_REQUEST["tbWebsite"], $_REQUEST["tbEmail"], $_REQUEST["tbPlace"])))
 					{
+						$User->Lastname = $_REQUEST["tbLastname"];
 						$User->Website = $_REQUEST["tbWebsite"];
 						$User->Email = $_REQUEST["tbEmail"];
 						$User->Place = $_REQUEST["tbPlace"];
@@ -99,7 +112,7 @@
 						else
 						{
 							?>
-							<div class="panel panel-success">
+							<div class="panel panel-danger">
 								<div class="panel-heading">
 									Fehler
 								</div>
@@ -129,21 +142,17 @@
 
 			?>
         </div>
-        <div class="tab-pane" id="image">
-            <h2>Bild ändern</h2>
-            <p>green green green green green</p>
-        </div>
-        <div class="tab-pane" id="deleteProfile">
+        <div class="tab-pane <?php if($Active == "deleteProfile") { echo "active"; } ?>" id="deleteProfile">
             <h2>Profil löschen</h2>
 			<?php
 				if($Active == 'deleteProfile')
 				{
-					// User löschen
-					$User->delete();
-					// User ausloggen			
+						// User ausloggen	
 					\Guestbook\Userauthenticator::logOut();
-					// Weiterleiten auf Startseite
-					 header('location: http://localhost/GUESTBOOK/GUESTBOOK/index.php');
+					if($User->delete())
+					{
+						header("Location: http://localhost/GUESTBOOK/GUESTBOOK/index.php?site=start");				
+					}
 				}
 			?>
             <p><button class='btn btn-danger' data-href='index.php?site=profile&active=deleteProfile' href='#' data-toggle='modal' data-target='#confirm-delete'><span class='glyphicon glyphicon-remove'>Delete</span></button></p>

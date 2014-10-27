@@ -74,9 +74,8 @@
 				setcookie("UserId", '', time() - 3600); // empty value and old timestamp
 				
 				unset($_COOKIE["UserToken"]);
-				setcookie("UserToken", '', time() - 3600); // empty value and old timestamp
+				setcookie("UserToken", '', time() - 3600); // empty value and old timestamp	
 			}
-			
 		}
 		
 		public static function setPassword($User, $oldPassword, $newPassword, $repeatNewPassword)
@@ -111,22 +110,42 @@
 			return false;
 		}
 		
+		public static function register($UserTemp, $PasswortRepeat)
+		{
+			if($UserTemp->Password == $PasswortRepeat)
+			{
+				$Users = Models\UserDbModel::readAll();
+				
+				foreach($Users as $User)
+				{
+					if($User->Nickname == $UserTemp->Nickname)
+					{
+						return false;
+					}
+				}
+				
+				$UserTemp->Password = self::encrypt($PasswortRepeat);
+				$RegistrySuccessfull = $UserTemp->create();
+				return $RegistrySuccessfull;
+			}
+			
+		}
+		
 		public static function getLogin($except, $repeat, $placeholders)
 		{
 			$LoginForm = new \FormularGenerator\formulargenerator("Login", "users", $except, $repeat, $placeholders, false);
 			return $LoginForm;
 		}
 		
-		public static function buildRegistryForm($except, $repeat, $placeholders)
+		public static function getRegistryForm($except, $repeat, $placeholders)
 		{
 			$RegisterForm = new \FormularGenerator\formulargenerator("Registrierungsformular", "users", $except, $repeat, $placeholders, false);
 			return $RegisterForm;
-			//$LoginForm->createForm("index.php?site=register");
 		}
 	
 		public static function getLoggedInUser()
 		{
-			$User = "lalalala";
+			$User = "";
 			if(self::isUserAlreadyLoggedIn())
 			{
 				$User = unserialize($_SESSION["User"]);

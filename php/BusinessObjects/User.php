@@ -7,9 +7,10 @@
 	{
 		public $idUser;
 		public $idGroup;
+		public $Firstname;
+		public $Lastname;
 		public $Nickname;
 		public $Password;
-		public $UserImage;
 		public $Email;
 		public $Website;
 		public $Place;
@@ -121,7 +122,7 @@
 			$this->CreationDate = date("Y-m-d", time());
 			$createSuccessfull = \Guestbook\Models\UserDbModel::create($this);
 			
-			return $createSuccessull;
+			return $createSuccessfull;
 		}
 		
 	}

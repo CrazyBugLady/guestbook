@@ -41,14 +41,13 @@
 			{
 				$User = $Entry->getUser();
 				echo "<table class='table table-striped'>" . PHP_EOL;
+				echo "<thead>" . PHP_EOL;
 				echo "<tr>". PHP_EOL;
 				echo "<td colspan='2'><a href='#' data-html='true' data-toggle='popover' data-content='Email: ".$User->Email."</br> Website: ".$User->Website."</br> Place: ".$User->Place."' data-placement='top' data-trigger='hover' data-title='User: ".$User->Nickname."'>".$User->Nickname."</a> von ". $User->Place ." schrieb am ".$Entry->getFormattedCreationDate()." ...</td>"; //<a href='mailto:".$User->Email."'>".$User->Nickname."</a> von ". $User->Place ." schrieb am ".$Entry->getFormattedCreationDate()." ...</th>". PHP_EOL;W
 				echo "</tr>". PHP_EOL;
+				echo "</thead>" . PHP_EOL;
 				echo "<tr>". PHP_EOL;
 				echo "<th colspan='2'>Title: " . $Entry->Title. "</th>". PHP_EOL;
-				echo "</tr>". PHP_EOL;
-				echo "<tr>". PHP_EOL;
-				echo "<th colspan='2'>Comment</th>". PHP_EOL;
 				echo "</tr>". PHP_EOL;
 				echo "<tr>". PHP_EOL;
 				echo "<td colspan='2'>" . $Entry->Comment . "</td>". PHP_EOL;
@@ -62,7 +61,7 @@
 				}
 			
 				echo "<tr>". PHP_EOL;
-				echo "<td colspan='2'>" . self::setOptions($Entry->idEntry, $loggedInUser) . "</td>". PHP_EOL;
+				echo "<td colspan='2'>" . self::setOptions($Entry, $loggedInUser) . "</td>". PHP_EOL;
 				echo "</tr>". PHP_EOL;
 				echo "</table>". PHP_EOL;
 			}
@@ -84,19 +83,19 @@
  			}*/
 		}
 		
-		public static function setOptions($idEntry, $User)
+		public static function setOptions($Entry, $User)
 		{
-			$edit = "<a href='index.php?site=edit&entry=". $idEntry ."'><span class='glyphicon glyphicon-pencil'>Edit</span></a>" . PHP_EOL;
-			$delete = "<a href='#' data-href='index.php?site=delete&entry=". $idEntry ."' data-toggle='modal' data-target='#confirm-delete'><span class='glyphicon glyphicon-remove'>Delete</span></a>" . PHP_EOL;			
+			$edit = "<a href='index.php?site=edit&entry=". $Entry->idEntry ."'><span class='glyphicon glyphicon-pencil'>Edit</span></a>" . PHP_EOL;
+			$delete = "<a href='#' data-href='index.php?site=delete&entry=". $Entry->idEntry ."' data-toggle='modal' data-target='#confirm-delete'><span class='glyphicon glyphicon-remove'>Delete</span></a>" . PHP_EOL;			
 			
 			$Options = "";
 			
-			if($User->hasRight("change_own") || $User->hasRight("change_others"))
+			if(($Entry->getUser()->Nickname == $User->Nickname && $User->hasRight("change_own")) || $User->hasRight("change_others"))
 			{
 				$Options .= $edit;
 			}
 	
-			if($User->hasRight("delete_own") || $User->hasRight("delete_others"))
+			if(($Entry->getUser()->Nickname == $User->Nickname && $User->hasRight("delete_own")) || $User->hasRight("delete_others"))
 			{
 				$Options .= $delete;
 			}

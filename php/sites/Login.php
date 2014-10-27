@@ -5,7 +5,7 @@
 
 	$User = \Guestbook\UserAuthenticator::getLoggedInUser();
 	
-	$LoginForm = Guestbook\UserAuthenticator::getLogin(array("id", "id_group",  "Email_e", "BirthDate", "Website", "Email", "Place", "ModificationDate", "UserImage_img", "CreationDate"), array(""), array());
+	$LoginForm = Guestbook\UserAuthenticator::getLogin(array("id", "id_group",  "Email_e", "Firstname", "Lastname", "BirthDate", "Website", "Email", "Place", "ModificationDate", "UserImage_i", "CreationDate"), array(""), array());
 ?>
 	<h1>Join da' partey</h1>
 <?php
@@ -45,5 +45,6 @@
 	else
 	{
 		$LoginForm->createForm("index.php?site=login");
+		echo "<a href='index.php?site=register'>Do you already have an account?</a><br>";
 	}
 ?>

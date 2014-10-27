@@ -19,7 +19,7 @@
 		{
 			self::$DB = \Guestbook\Data\DB::getConnection("read", "Resources/Configuration/config.ini");
 	
-			$stmt = self::$DB->prepare("SELECT id, Nickname, Passwort_p, CreationDate, UserImage_img, Website, Email_e, BirthDate, id_group, ModificationDate, Place FROM users WHERE id = ?");
+			$stmt = self::$DB->prepare("SELECT id, Nickname, Firstname, Lastname, Passwort_p, CreationDate, Website, Email_e, BirthDate, id_group, ModificationDate, Place FROM users WHERE id = ?");
 			$stmt->bind_param("i", $idUser);
 			
 			$user = new \Guestbook\BusinessObjects\User();
@@ -29,10 +29,11 @@
 				$row = $result->fetch_assoc();
 		
 				$user->idUser = $row["id"];
+				$user->Firstname = $row["Firstname"];
+				$user->Lastname = $row["Lastname"];
 				$user->Nickname = $row["Nickname"];
 				$user->Password = $row["Passwort_p"];
 				$user->CreationDate = $row["CreationDate"];
-				$user->UserImage = $row["UserImage_img"];
 				$user->Website = $row["Website"];
 				$user->Email = $row["Email_e"];
 				$user->BirthDate = $row["BirthDate"];
@@ -49,7 +50,7 @@
 		{
 			self::$DB = \Guestbook\Data\DB::getConnection("read", "Resources/Configuration/config.ini");
 			
-			$stmt = self::$DB->prepare("SELECT id, Nickname, Passwort_p, CreationDate, Website, UserImage_img, ModificationDate, Place, Email_e, BirthDate, id_group FROM users");
+			$stmt = self::$DB->prepare("SELECT id, Nickname, Lastname, Firstname, Passwort_p, CreationDate, Website, ModificationDate, Place, Email_e, BirthDate, id_group FROM users");
 			
 			$users = array();
 			
@@ -65,8 +66,9 @@
 					$user->idUser = $row["id"];
 					$user->idGroup = $row["id_group"];
 					$user->Nickname = $row["Nickname"];
+					$user->Firstname = $row["Firstname"];
+					$user->Lastname = $row["Lastname"];
 					$user->Password = $row["Passwort_p"];
-					$user->UserImage = $row["UserImage_img"];
 					$user->Email = $row["Email_e"];
 					$user->Website = $row["Website"];
 					$user->Place = $row["Place"];
@@ -83,29 +85,27 @@
 		
 		public static function create($user)
 		{
-			$user->CreationDate = time();
-			$stmt = $this->DB->prepare("INSERT INTO users (Nickname, Passwort_p, UserImage_img, id_group, CreationDate, Website, Email_e, Place, BirthDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-			$stmt->bind_param("sss" .
-								   "i" . 
-								   "sssss", 
-								  $user->Nickname, $user->Password, $user->UserImage,
-								  $user->idGroup, 
-								  $user->CreationDate, $user->Website, $user->Email, $user->Place, $user->BirthDate);
+			self::$DB = \Guestbook\Data\DB::getConnection("insert", "Resources/Configuration/config.ini");
+			$stmt = self::$DB->prepare("INSERT INTO users (Nickname, Lastname, Firstname, Passwort_p, CreationDate, Website, Email_e, Place, BirthDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			$stmt->bind_param("sssssssss", 
+							  $user->Nickname, $user->Lastname, $user->Firstname, $user->Password, $user->CreationDate, $user->Website, $user->Email, $user->Place, $user->BirthDate);
+			$successCreate = $stmt->execute();
 			
-			$stmt->execute();
+			self::$DB->close();
 			
-			
+			return $successCreate;
 		}
 		
 		public static function update($user)
 		{
 			self::$DB = \Guestbook\Data\DB::getConnection("edit", "Resources/Configuration/config.ini");
 			$stmt = self::$DB->prepare("UPDATE users SET Passwort_p = ?, " .
+													"Lastname = ?," .
 													"Email_e = ?, " .
 													"Website = ?, " .
 													"Place = ? " .
 									   "WHERE id = ?");
-			$stmt->bind_param("ssssi", $user->Password, $user->Email, $user->Website, $user->Place, $user->idUser);
+			$stmt->bind_param("sssssi", $user->Password, $user->Lastname, $user->Email, $user->Website, $user->Place, $user->idUser);
 			$successUpdate = $stmt->execute();	
 
 			self::$DB->close();			
