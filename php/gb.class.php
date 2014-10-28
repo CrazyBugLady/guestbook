@@ -4,12 +4,13 @@
 	require_once("Models/EntryDbModel.php");
 	require_once("BusinessObjects/Entry.php");
 	require_once("BusinessObjects/User.php");
+	require_once("BusinessObjects/EntryFilter.php");
 	
 	class gb
 	{	
 		private $except;
 		
-		private static $perSite = 10,
+		private static $perSite = 5,
 				$Title = 'Guestbook';
 		
 		public static function countAllEntries()
@@ -18,26 +19,29 @@
 			return sizeof($Entries);
 		}
 		
-		public static function showEntries($loggedInUser)//$SortBy)
-		{
-			$Entries = \Guestbook\Models\EntryDbModel::readAll(); 
+		// Entries anzeigen mit selbst generiertem Filter
+		public static function showEntries($loggedInUser, $Page)
+		{			
+			$Filter = self::generateFilter(0, "CreationDate", "desc"); 
 			
-			//$EndPoint = $_SESSION["Startpoint"] + $this->perSite;
+			$EntriesAll = \Guestbook\Models\EntryDbModel::readAll($Filter); // um alle Einträge zu kriegen, zuerst nicht Paging aktivieren
+			
+			$Filter = self::generateFilter($Page, "CreationDate", "desc");
+			
+			$EntriesCurrentPage = \Guestbook\Models\EntryDbModel::readAll($Filter); // um nur Einträge von der aktuellen Page zu erhalten
 			
 			echo "<h2>". self::$Title ."</h2>";
 			
-			echo "<h3>Einträge (". sizeof($Entries) .")</h3>";
+			echo "<h3>Einträge (". sizeof($EntriesAll) .")</h3>";
 			
-			echo "<ul class='pagination'>" . PHP_EOL . 
-					"<li><a href='#'>&laquo;</a></li>" . PHP_EOL . 
-					"<li class='active'><a href='#'>1</a></li>" . PHP_EOL . 
-					"<li><a href='#'>2</a></li>" . PHP_EOL . 
-					"<li><a href='#'>3</a></li>" . PHP_EOL . 
-					"<li><a href='#'>4</a></li>" . PHP_EOL . 
-					"<li><a href='#'>&raquo;</a></li>" . PHP_EOL . 
-				"</ul>";
+			self::setPaging(sizeof($EntriesAll), $Page);
+					
+			if($loggedInUser != "")
+			{
+				echo "<p><a href='index.php?site=sign'>You want to make an entry?</a></p>" . PHP_EOL;
+			}
 			
-			foreach($Entries as $Entry)
+			foreach($EntriesCurrentPage as $Entry)
 			{
 				$User = $Entry->getUser();
 				echo "<table class='table table-striped'>" . PHP_EOL;
@@ -59,30 +63,54 @@
 					echo "<td>Dieser Eintrag wurde zuletzt überarbeitet am ".$Entry->getFormattedModificationDate()."</td>";
 					echo "</tr>" . PHP_EOL;
 				}
-			
-				echo "<tr>". PHP_EOL;
-				echo "<td colspan='2'>" . self::setOptions($Entry, $loggedInUser) . "</td>". PHP_EOL;
-				echo "</tr>". PHP_EOL;
-				echo "</table>". PHP_EOL;
+				
+				if($loggedInUser != "")
+				{
+					echo "<tr>". PHP_EOL;
+					echo "<td colspan='2'>" . self::setOptions($Entry, $loggedInUser) . "</td>". PHP_EOL;
+					echo "</tr>". PHP_EOL;
+					echo "</table>". PHP_EOL;
+				}
+				
 			}
-			
-			echo "<a href='index.php?site=sign'>You want to make an entry?</a>";
-			
-			/*$Sites = round($AmountEntries / $this->perSite) + 1; 
-			
-			for($i = 1; $i <= $Sites; $i++)
+			if(sizeof($EntriesCurrentPage) == 0)
 			{
-				if($i == $_SESSION['Startpoint'])
-				{
-					echo "<div class='text-center'><b>" . $i . "</b></div> ";
-				}
-				else
-				{
-					echo "<div class='text-center'>" . $i . "</div>";
-				}
- 			}*/
+				echo "<p>Auf dieser Seite gibt es keine Einträge!</p>" . PHP_EOL;
+			}
 		}
 		
+		public static function setPaging($Entries, $currentPage)
+		{
+			$SiteAmount = ceil($Entries / self::$perSite);
+			
+			echo "<ul class='pagination'>" . PHP_EOL;
+			
+			for ($Page = 1; $Page <= $SiteAmount; $Page++)
+			{
+				$ActiveAttribute = ($Page == $currentPage) ? "class='active'" : "";
+				echo "<li ". $ActiveAttribute ."><a href='index.php?site=show&page=". $Page ."'>". $Page ."</a></li>" . PHP_EOL; 
+			}
+			
+			echo "</ul>" . PHP_EOL;
+		}
+		
+		public static function generateFilter($currentPage, $orderBy, $orderByDirection)
+		{
+			$Endpoint = 0;
+			$Startpoint = 0;
+			
+			if($currentPage != 0)
+			{
+				$Endpoint = $currentPage * self::$perSite; // bsp: Seite 2 = Endpunkt 20
+				$Startpoint = $Endpoint - self::$perSite; // bsp: Seite 2 = Endpunkt 20 - 10 = 10
+			}
+			
+			$generatedFilter = new \Guestbook\BusinessObjects\EntryFilter($Startpoint, $Endpoint, $orderBy, $orderByDirection);
+			
+			return $generatedFilter;
+		}
+		
+		// Options depending on User Rights
 		public static function setOptions($Entry, $User)
 		{
 			$edit = "<a href='index.php?site=edit&entry=". $Entry->idEntry ."'><span class='glyphicon glyphicon-pencil'>Edit</span></a>" . PHP_EOL;

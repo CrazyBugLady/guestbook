@@ -9,6 +9,8 @@
 	$EntryForm = Guestbook\gb::getEntryForm("Gästebucheintrag schreiben", "gbentries", array("id", "id_user", "CreationDate", "ModificationDate"), array(), array());
 	$EntryForm->createForm("index.php?site=sign");
 	
+	echo "<a href='index.php?site=show'>Zurück zum Gästebuch</a>";
+	
 	if(array_key_exists("submit", $_REQUEST))
 	{
 		if($EntryForm->validationSuccessful(array($_REQUEST["tbTitle"], $_REQUEST["txtComment"])))

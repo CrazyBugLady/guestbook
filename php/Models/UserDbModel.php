@@ -2,7 +2,6 @@
 	
 	namespace Guestbook\Models;
 		
-	require_once("php/Models/iDbModel.php");
 	require_once("php/Data/DB.class.php");
 	require_once("php/BusinessObjects/User.php");
 
@@ -122,7 +121,7 @@
 			
 			self::$DB->close();
 			
-			return $successUpdate;
+			return $successDelete;
 		}
 
 	}

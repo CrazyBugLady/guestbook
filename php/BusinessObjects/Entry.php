@@ -32,22 +32,21 @@
 		
 		public function getFormattedModificationDate()
 		{
-			return date("d.m.Y", strtotime($this->ModificationDate));
+			return date("d.m.Y H:i:s", strtotime($this->ModificationDate));
 		}
 		
 		public function getFormattedCreationDate()
 		{
-			return date("d.m.Y", strtotime($this->CreationDate));
+			return date("d.m.Y H:i:s", strtotime($this->CreationDate));
 		}
 		
 		public function hasBeenModified()
 		{
-			return $this->ModificationDate != "0000-00-00";
+			return $this->ModificationDate != "0000-00-00 00:00:00";
 		}
 		
 		public function create()
 		{
-			$this->CreationDate = date("Y-m-d", time());
 			$createSuccessfull = \Guestbook\Models\EntryDbModel::create($this);
 			
 			return $createSuccessfull;
@@ -62,7 +61,6 @@
 		
 		public function update()
 		{
-			$this->ModificationDate = date("Y-m-d", time());
 			$updateSuccessfull = \Guestbook\Models\EntryDbModel::update($this);
 			
 			return $updateSuccessfull;

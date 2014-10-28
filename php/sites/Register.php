@@ -69,7 +69,7 @@
 					</div>
 		
 					<div class="panel-body">
-						Du konntest nicht erfolgreich angemeldet werden. Ist der Username eventuell schon vergeben?
+						Du konntest nicht erfolgreich angemeldet werden. Ist der Username oder die Mail eventuell schon vergeben?
 					</div>
 				</div>
 			<?php
@@ -86,7 +86,7 @@
 		
 					<div class="panel-body">
 						<?php
-							$RegisterForm->showValidationResult();
+							echo $RegisterForm->showValidationResult(array($Nickname, $Firstname, $Lastname, $Password, $PasswordRepeat, $Website, $Email, $Place, $BirthDate));
 						?>
 					</div>
 				</div>

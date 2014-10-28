@@ -1,13 +1,22 @@
 <?php
 	require_once("php/FormularCreator/formulargenerator.class.php");
 	require_once("php/UserAuthenticator.php");
-	require_once("php/Models/EntryDbModel.php");
-	require_once("php/gb.class.php");
-
-	require_once("php/inc/loginChecker.php");
 	
 	$Active = (array_key_exists("active", $_REQUEST)) ? $_REQUEST["active"] : "profile";
 	
+	if($Active == 'deleteProfile')
+	{
+		// User ausloggen	
+		$UserTemp = $User;
+		
+		\Guestbook\Userauthenticator::logOut();
+		if($UserTemp->delete())
+		{
+			header("Location: http://localhost/GUESTBOOK/GUESTBOOK/index.php?site=start");				
+		}
+	}
+	
+	require_once("php/inc/loginChecker.php");
 ?>
 	<h1>Edit Profile</h1>
 
@@ -31,9 +40,11 @@
 				$PasswordForm->createForm("index.php?site=profile&active=passwort");
 				
 				if(array_key_exists("pwPasswort", $_REQUEST))
-				{
-					if(\Guestbook\UserAuthenticator::setPassword($User, $_REQUEST["pwPasswort"], $_REQUEST["pwnewPasswort"], $_REQUEST["pwrepeatPasswort"]))
+				{	
+					if($PasswordForm->validationSuccessful(array($_REQUEST["pwPasswort"], $_REQUEST["pwnewPasswort"], $_REQUEST["pwrepeatPasswort"])))
 					{
+						if(\Guestbook\UserAuthenticator::setPassword($User, $_REQUEST["pwPasswort"], $_REQUEST["pwnewPasswort"], $_REQUEST["pwrepeatPasswort"]))
+						{
 						?>
 							<div class="panel panel-success">
 								<div class="panel-heading">
@@ -45,9 +56,9 @@
 								</div>
 							</div>
 						<?php
-					}
-					else
-					{
+						}
+						else
+						{
 						?>
 							<div class="panel panel-danger">
 								<div class="panel-heading">
@@ -61,6 +72,23 @@
 										<li>Neues Passwort und Wiederholung davon stimmen überein</li>
 										<li>Wende dich bei Zweifeln an den Administrator!</li>
 									</ul>
+								</div>
+							</div>
+						<?php
+						}
+					}
+					else
+					{
+						?>
+							<div class="panel panel-danger">
+								<div class="panel-heading">
+									Ändern des Passworts nicht erfolgreich
+								</div>
+					
+								<div class="panel-body">
+									<?php
+										echo $PasswordForm->showValidationResult(array($_REQUEST["pwPasswort"], $_REQUEST["pwnewPasswort"], $_REQUEST["pwrepeatPasswort"]));
+									?>
 								</div>
 							</div>
 						<?php
@@ -133,7 +161,9 @@
 								</div>
 					
 								<div class="panel-body">
-									Du konntest deine nicht Kontaktdaten erfolgreich ändern. Überprüfe die verschiedenen Formate nochmals.
+									<?php
+										echo $ContactDataForm->showValidationResult(array($_REQUEST["tbLastname"], $_REQUEST["tbWebsite"], $_REQUEST["tbEmail"], $_REQUEST["tbPlace"]));
+									?>
 								</div>
 							</div>
 						<?php
@@ -144,17 +174,8 @@
         </div>
         <div class="tab-pane <?php if($Active == "deleteProfile") { echo "active"; } ?>" id="deleteProfile">
             <h2>Profil löschen</h2>
-			<?php
-				if($Active == 'deleteProfile')
-				{
-						// User ausloggen	
-					\Guestbook\Userauthenticator::logOut();
-					if($User->delete())
-					{
-						header("Location: http://localhost/GUESTBOOK/GUESTBOOK/index.php?site=start");				
-					}
-				}
-			?>
+			<p>Sofern du kein Interesse mehr an deiner Mitgliedschaft hast, kannst du dein Profil mit Klick auf den unteren Button löschen. 
+			Hast du die gewünschte Löschung bestätigt, wirst du ausgeloggt und direkt zur Startseite weitergeleitet.</p>
             <p><button class='btn btn-danger' data-href='index.php?site=profile&active=deleteProfile' href='#' data-toggle='modal' data-target='#confirm-delete'><span class='glyphicon glyphicon-remove'>Delete</span></button></p>
         </div>
     </div>

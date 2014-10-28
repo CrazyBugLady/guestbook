@@ -13,6 +13,8 @@
 	$EntryForm = Guestbook\gb::getEntryForm("Gästebucheintrag bearbeiten", "gbentries", array("id", "id_user", "CreationDate", "ModificationDate"), array(), array($Entry->Title, $Entry->Comment));
 	$EntryForm->createForm("index.php?site=edit&entry=" . $_REQUEST["entry"]);
 	
+	echo "<a href='index.php?site=show'>Zurück zum Gästebuch?</a>";
+	
 	if(array_key_exists("submit", $_REQUEST))
 	{
 		if($EntryForm->validationSuccessful(array($_REQUEST["tbTitle"], $_REQUEST["txtComment"])))

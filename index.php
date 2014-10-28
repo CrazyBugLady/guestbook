@@ -4,7 +4,6 @@
 	require_once("php\gb.class.php");
 	
 	$User = \Guestbook\UserAuthenticator::getLoggedInUser();
-	
 ?>
 
 <!DOCTYPE html>
@@ -55,10 +54,10 @@
 						"<div class='modal-dialog'>" . PHP_EOL . 
 							"<div class='modal-content'>" . PHP_EOL .
 								"<div class='modal-header'>" . PHP_EOL .
-									"Löschen dieses Eintrags" . PHP_EOL .
+									"Löschung" . PHP_EOL .
 								"</div>" . PHP_EOL .
 								"<div class='modal-body'>" . PHP_EOL .
-									"Willst du diesen Eintrag wirklich löschen? Achtung: Diese Aktion kann nicht mehr rückgängig gemacht werden!" . PHP_EOL .
+									"Willst du die angeforderte Löschung wirklich bestätigen? (Achtung: kann NICHT rückgängig gemacht werden!)" . PHP_EOL .
 								"</div>" . PHP_EOL .
 								"<div class='modal-footer'>" . PHP_EOL .
 									"<button type='button' class='btn btn-default' data-dismiss='modal'>Cancel</button>" . PHP_EOL .
@@ -105,15 +104,15 @@
 					case "show":
 						include_once("php/sites/showEntries.php");
 						break;
+					case "logout":
+						include_once("php/sites/LogOut.php");
+						break;
 				}
-				
-					if($_REQUEST["site"] == "logout")
-					{
-						echo "<h2>Logout</h2>";
-						GuestBook\UserAuthenticator::logOut();
-						echo "Du wurdest erfolgreich ausgeloggt";
-					}
-				}
+			}
+			else
+			{
+				include_once("php/sites/Start.php");
+			}
 			?>
 				</div>
 			</div>

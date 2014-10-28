@@ -114,7 +114,7 @@
 		{
 			$deleteSuccessfull = \Guestbook\Models\UserDbModel::delete($this);
 			
-			return $deleteSuccessull;
+			return $deleteSuccessfull;
 		}
 		
 		public function create()

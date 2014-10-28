@@ -13,7 +13,10 @@
 		{
 			foreach($Fields as $Field)
 			{
-				self::validate($Field);
+				if($Field->Repetition == false)
+				{
+					self::validate($Field);
+				}
 			}
 		}
 	
@@ -31,7 +34,7 @@
 					$this->errorValidation .= "Format von " . $Field->FormFieldName . " falsch! <br>";
 					break;
 				case errorCodes::ERR_PASSWORD:
-					$this->errorValidation .= "Passwortformat: mindestens 1 Buchstabe, 1 Zahl & 1 Sonderzeichen ( 8 - 20 Zeichen )";
+					$this->errorValidation .= "Passwortformat: mindestens 1 kleiner Buchstabe, 1 grosser Buchstabe, 1 Zahl( 8 - 20 Zeichen ) <br>";
 					break;
 			}
 		}

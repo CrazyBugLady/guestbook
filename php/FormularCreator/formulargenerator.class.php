@@ -64,7 +64,7 @@
 				echo "<div class='form-group'>";
 					echo "<div class='col-sm-offset-2 col-sm-10'>";
 						echo "<button type='submit' class='btn btn-success' name='submit'>Abschicken</button>";
-						echo "<button type='cancel' class='btn btn-default'>Cancel</button>";
+						echo "<button type='reset' class='btn btn-default'>Zurücksetzen</button>";
 					echo "</div>";
 				echo "</div>";
 			echo "</form>";
@@ -81,7 +81,7 @@
 			{
 				if(in_array($data['Field'], $this->except) == false && in_array($data['Field'], $this->repeat) == false)
 				{
-					$FormField = new FormField($data['Field'], $data['Type'], $data['Null']);
+					$FormField = new FormField($data['Field'], $data['Type'], $data['Null'], false);
 					$Formfields[$i] = $FormField;
 					$i++;
 				}
@@ -99,7 +99,10 @@
 					
 					for($repeatIndex = 0; $repeatIndex < $repeatCount; $repeatIndex++)
 					{
-						$FormField = new FormField($usedArray[$repeatIndex] . " " . $data['Field'], $data['Type'], $data['Null']);
+						
+						$Repetition = ($repeatIndex == 2 && sizeof($usedArray) == 2) ? true : (sizeOf($usedArray) > 2 && ($repeatIndex == 0 || $repeatIndex == 2)) ? true : false; // wenn ersteres der Fall ist, dann muss nur das erste überprüft werden... wenn letzteres der Fall ist, nur das zweite
+						
+						$FormField = new FormField($usedArray[$repeatIndex] . " " . $data['Field'], $data['Type'], $data['Null'], $Repetition);
 						$Formfields[$i] = $FormField;
 						$i++;
 					}
@@ -129,8 +132,10 @@
 		public function validationSuccessful($Values)
 		{
 			$this->validate($Values);
+			$validationSuccessfull = $this->Validator->validationSuccessful();
+			$this->Validator->errorValidation = "";
 			
-			return $this->Validator->validationSuccessful();
+			return $validationSuccessfull;
 		}
 		
 		public function showValidationResult($Values) // returns the errors

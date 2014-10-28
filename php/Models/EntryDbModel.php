@@ -1,7 +1,6 @@
 <?php
 	namespace Guestbook\Models;
 
-	require_once("php/Models/iDbModel.php");
 	require_once("php/Data/DB.class.php");
 	require_once("php/BusinessObjects/Entry.php");
 	
@@ -37,7 +36,14 @@
 		{
 			self::$DB = \Guestbook\Data\DB::getConnection("read", "Resources/Configuration/config.ini");
 			
-			$stmt = self::$DB->prepare("SELECT id, Title, Comment, ModificationDate, CreationDate, id_user FROM gbentries order by CreationDate desc");
+			$SQL = "SELECT id, Title, Comment, ModificationDate, CreationDate, id_user FROM gbentries";
+			
+			if($filter != null)
+			{
+				$SQL = $filter->addToSql($SQL);
+			}
+			
+			$stmt = self::$DB->prepare($SQL);
 			
 			$entries = array();
 			
@@ -65,9 +71,9 @@
 			self::$DB = \Guestbook\Data\DB::getConnection("insert", "Resources/Configuration/config.ini");
 			
 			$stmt = self::$DB->prepare("INSERT INTO gbentries" .
-									   " (Title, Comment, CreationDate, id_user)" .
-									   " VALUES (?, ?, ?, ?)");
-			$stmt->bind_param("sssi", $entry->Title, $entry->Comment, $entry->CreationDate, $entry->idUser);
+									   " (Title, Comment, id_user)" .
+									   " VALUES (?, ?, ?)");
+			$stmt->bind_param("ssi", $entry->Title, $entry->Comment, $entry->idUser);
 			
 			$successCreate = $stmt->execute();
 			
@@ -80,11 +86,11 @@
 		{
 			self::$DB = \Guestbook\Data\DB::getConnection("edit", "Resources/Configuration/config.ini");
 
-			$stmt = self::$DB->prepare("UPDATE gbentries SET ModificationDate = ?, " . 
+			$stmt = self::$DB->prepare("UPDATE gbentries SET ModificationDate = now(), " . 
 													"Title = ?, " .
 													"Comment = ? " .
 									   "WHERE id = ?");
-			$stmt->bind_param("sssi", $entry->ModificationDate, $entry->Title, $entry->Comment, $entry->idEntry);
+			$stmt->bind_param("ssi", $entry->Title, $entry->Comment, $entry->idEntry);
 			
 			$successUpdate = $stmt->execute();
 			

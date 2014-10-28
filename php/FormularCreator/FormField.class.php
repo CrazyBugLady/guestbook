@@ -13,18 +13,20 @@
 	public $Maxlength;
 	public $isRequired;
 	public $FieldValue;
+	public $Repetition;
 	
 	/**
 	 * Konstruktor der FormField - Klasse
 	 * In diesem Konstruktor wird der Formularfeld - Typ ermittelt, der Name zusammengebastelt (entweder wird die Endung abgeschnitten oder es wird dabei belassen, dass die Endung nicht abgeschnitten werden muss)
 	 * Es wird festgestellt ob es ein Pflichtfeld ist.
 	 */
-	function __construct($AttribName, $AttribType, $Null)
+	function __construct($AttribName, $AttribType, $Null, $Repetition)
 	{
 		$this->FormFieldType = $this->generateType($AttribName, $AttribType);
 		// Je nach Typ muss die Endung abgeschnitten werden, die zur Unterscheidung bei sonst nicht unterscheidbaren Feldern dient
 		$this->FormFieldName = ($this->FormFieldType == Fieldtypes::Radiobutton || $this->FormFieldType == Fieldtypes::Select || $this->FormFieldType == Fieldtypes::Password || $this->FormFieldType == Fieldtypes::Email) ? substr($AttribName, 0, -2) : $AttribName; 
 		$this->isRequired = ($Null == "YES") ? false : true;
+		$this->Repetition = $Repetition;
 	}
 	/**
 	 * Generiert den Typ des Formularfeldes aufgrund des Datenfeldnamens und seines Typs (mit eventuell vorhandener Maximallänge des Inhalts)
@@ -199,7 +201,11 @@
 					}
 					break;
 				case FieldTypes::Password:
-					if(!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,20}$/', $this->FieldValue)){
+					$uppercase = preg_match('@[A-Z]@', $this->FieldValue);
+					$lowercase = preg_match('@[a-z]@', $this->FieldValue);
+					$number    = preg_match('@[0-9]@', $this->FieldValue);
+					
+					if(!$uppercase || !$lowercase || !$number || strlen($this->FieldValue) < 8) {
 						return errorCodes::ERR_PASSWORD;
 					}
 					break;

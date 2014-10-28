@@ -76,6 +76,8 @@
 				unset($_COOKIE["UserToken"]);
 				setcookie("UserToken", '', time() - 3600); // empty value and old timestamp	
 			}
+			
+			return true;
 		}
 		
 		public static function setPassword($User, $oldPassword, $newPassword, $repeatNewPassword)
@@ -83,6 +85,7 @@
 			if(self::encrypt($oldPassword) == $User->Password && $repeatNewPassword == $newPassword) // zu dem Zeitpunkt ist das Userpasswort noch das alte Passwort, muss also nicht extra mitübergeben werden
 			{
 				$User->Password = self::encrypt($newPassword);
+				$_SESSION["User"] = serialize($User);
 				
 				return $User->update();
 			}
@@ -118,7 +121,7 @@
 				
 				foreach($Users as $User)
 				{
-					if($User->Nickname == $UserTemp->Nickname)
+					if($User->Nickname == $UserTemp->Nickname || $User->Email == $UserTemp->Email)
 					{
 						return false;
 					}
